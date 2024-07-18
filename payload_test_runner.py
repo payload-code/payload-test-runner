@@ -161,7 +161,7 @@ def run_docker_test(ip_address, test_choice):
     )
 
     current_dir = os.getcwd()
-    if docker_compose_dir not in current_dir:
+    if not current_dir.startswith(docker_compose_dir):
         os.chdir(docker_compose_dir)
 
     command = f"DOCKER_HOST_IP={ip_address} docker-compose run --service-ports payload-webapp pdm run python -m gevent.monkey --module pytest tests -vv {test_argument}"
