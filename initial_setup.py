@@ -1,0 +1,46 @@
+import os
+import json
+from colorama import Fore
+
+config_file = "config.json"
+
+
+def load_config():
+    global docker_compose_dir
+    if os.path.exists(config_file):
+        with open(config_file, "r") as f:
+            config = json.load(f)
+            docker_compose_dir = config.get("docker_compose_dir")
+
+
+def save_config():
+    config = {"docker_compose_dir": docker_compose_dir}
+    with open(config_file, "w") as f:
+        json.dump(config, f)
+
+
+def setup():
+    load_config()
+
+    if not docker_compose_dir:
+        print(Fore.GREEN + "Welcome to Payload WebApp Test Automation Setup!")
+        configure_docker_compose_dir()
+
+
+def configure_docker_compose_dir():
+    global docker_compose_dir
+    docker_compose_dir = input(
+        "Enter the absolute path to your payload-webapp docker-compose directory: "
+    ).strip()
+    if not os.path.isdir(docker_compose_dir):
+        print(
+            Fore.RED + f"Directory '{docker_compose_dir}' does not exist or is invalid."
+        )
+        configure_docker_compose_dir()
+    save_config()
+    print(Fore.GREEN + "Setup completed successfully!")
+
+
+def get_docker_compose_dir():
+    load_config()
+    return docker_compose_dir
