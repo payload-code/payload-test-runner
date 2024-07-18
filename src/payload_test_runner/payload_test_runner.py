@@ -160,9 +160,12 @@ def run_docker_test(ip_address, test_choice):
         "" if test_choice.lower() == "all" else f"-k {test_choice} --rebuild-db"
     )
 
-    current_dir = os.getcwd()
-    if not current_dir.startswith(docker_compose_dir):
-        os.chdir(docker_compose_dir)
+    current_dir = os.path.abspath(os.getcwd())
+    docker_compose_abs = os.path.abspath(docker_compose_dir)
+
+    if current_dir != docker_compose_abs:
+        print(Fore.YELLOW + "Changing directory to docker-compose directory")
+        os.chdir(docker_compose_abs)
 
     command = f"DOCKER_HOST_IP={ip_address} docker-compose run --service-ports payload-webapp pdm run python -m gevent.monkey --module pytest tests -vv {test_argument}"
     docker_process = subprocess.Popen(command, shell=True)
