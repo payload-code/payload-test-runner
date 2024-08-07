@@ -20,15 +20,15 @@ def main():
         ip_address = get_ip_address()
         if ip_address:
             print(f"IP Address: {ip_address}")
-            hub_process, node_process = start_selenium_server(ip_address)
+            selenium_server = start_selenium_server()
             exit_containers()
-            if hub_process and node_process:
+            if selenium_server:
                 print(Fore.GREEN + "Running Docker tests...")
                 run_docker_tests(ip_address)
         else:
             print(Fore.RED + "Failed to find IP address.")
     finally:
-        cleanup(hub_process, node_process)
+        cleanup(selenium_server)
 
 
 if __name__ == "__main__":

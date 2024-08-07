@@ -7,6 +7,7 @@ from art import text2art
 from colorama import Fore
 from docker_management import restart_containers, get_exited_containers
 from initial_setup import get_docker_compose_dir
+from config import DOCKER_COMPOSE_CMD
 
 cache_file = "test_cache.pkl"
 
@@ -93,7 +94,7 @@ def run_docker_test(ip_address, test_choice):
         print(Fore.YELLOW + "Changing directory to docker-compose directory")
         os.chdir(docker_compose_abs)
 
-    command = f"DOCKER_HOST_IP={ip_address} docker-compose run --service-ports payload-webapp pdm run python -m gevent.monkey --module pytest tests -vv {test_argument}"
+    command = f"DOCKER_HOST_IP={ip_address} {DOCKER_COMPOSE_CMD} run --service-ports payload-webapp pdm run python -m gevent.monkey --module pytest tests -vv {test_argument}"
     docker_process = subprocess.Popen(command, shell=True)
     docker_process.wait()
 
@@ -125,13 +126,13 @@ def get_ip_address():
             return ip_address
         except subprocess.CalledProcessError:
             return None
+    elif system == "Linux":
+        return '172.17.0.1'
     else:
         print(f"Unsupported operating system: {system}")
         return None
 
 
-def cleanup(hub_process, node_process):
+def cleanup(hub_process):
     if hub_process:
         hub_process.terminate()
-    if node_process:
-        node_process.terminate()
