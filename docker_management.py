@@ -47,3 +47,15 @@ def get_exited_containers():
     for container_name in docker_container_names:
         if not is_container_running(container_name):
             exited_containers.append(container_name)
+
+
+def run_command_in_container(container_name, command):
+    if is_container_running(container_name):
+        try:
+            print(Fore.CYAN + f"Running command in {container_name}: {command}")
+            subprocess.run(f"docker exec {container_name} {command}", shell=True, check=True)
+            print(Fore.GREEN + "Command executed successfully.")
+        except subprocess.CalledProcessError as e:
+            print(Fore.RED + f"Failed to execute command: {e}")
+    else:
+        print(Fore.RED + f"Container {container_name} is not running.")

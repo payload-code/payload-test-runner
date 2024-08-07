@@ -17,18 +17,18 @@ def print_payload_art():
     print(Fore.CYAN + art)
 
 
-def run_docker_tests(ip_address, previous_test_choice=None):
+def run_docker_tests(ip_address):
     test_cache = load_test_cache()
+    previous_test_choice = None
+
     while True:
-        choices = [
-            "Run all tests",
-            "Run specific test",
-            "Rerun previous test",
-            "Exit",
-        ]
+        choices = ["Run all tests", "Run specific test", "Exit"]
+
+        if previous_test_choice:
+            choices.insert(0, "Rerun previous test")
 
         if test_cache:
-            choices.insert(3, "View test history")
+            choices.append("View test history")
         if get_exited_containers():
             choices.append("Exit and restart exited containers")
 
@@ -37,20 +37,21 @@ def run_docker_tests(ip_address, previous_test_choice=None):
                 "choice",
                 message="What would you like to do?",
                 choices=choices,
-                default="Run all tests",
+                default=choices[0],
             ),
         ]
         answer = inquirer.prompt(questions)["choice"]
 
-        if answer == "Run all tests":
+        #TODO: Add options menu for settings like rebuild-db, rebundle, etc.
+        if answer == "Rerun previous test" and previous_test_choice:
+            run_docker_test(ip_address, previous_test_choice)
+        elif answer == "Run all tests":
             run_docker_test(ip_address, "all")
             previous_test_choice = "all"
         elif answer == "Run specific test":
             test_name = input("Enter the test name: ")
             run_docker_test(ip_address, test_name)
             previous_test_choice = test_name
-        elif answer == "Rerun previous test" and previous_test_choice:
-            run_docker_test(ip_address, previous_test_choice)
         elif answer == "View test history":
             print("Test history:")
             for test in test_cache:
@@ -105,7 +106,7 @@ def run_docker_test(ip_address, test_choice):
 
 def get_ip_address():
     system = platform.system()
-    if system == "Darwin":  # macOS
+    if system == "Darwin":
         try:
             output = (
                 subprocess.check_output("ipconfig getifaddr en0", shell=True)
