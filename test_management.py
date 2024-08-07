@@ -42,6 +42,7 @@ def run_docker_tests(ip_address):
         ]
         answer = inquirer.prompt(questions)["choice"]
 
+        #TODO: Add options menu for settings like rebuild-db, rebundle, etc.
         if answer == "Rerun previous test" and previous_test_choice:
             run_docker_test(ip_address, previous_test_choice)
         elif answer == "Run all tests":
