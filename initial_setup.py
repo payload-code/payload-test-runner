@@ -1,5 +1,6 @@
 import os
 import json
+import subprocess
 from colorama import Fore
 
 from config import CONFIG_FILE as config_file
@@ -48,3 +49,18 @@ def get_docker_compose_dir():
     """Get the docker compose directory from the configuration."""
     load_config()
     return docker_compose_dir
+
+def check_java_exists():
+    """Ensure that Java exists on the host system."""
+    try:
+        result = subprocess.run(['java', '-version'], capture_output=True, text=True)
+        if result.returncode == 0:
+            print("Java has been detected.")
+            print(result.stderr.splitlines()[0])
+            return True
+        else:
+            print("Java is not installed.")
+            return False
+    except FileNotFoundError:
+        print("Java is not installed.")
+        return False
