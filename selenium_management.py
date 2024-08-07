@@ -33,57 +33,39 @@ def terminate_existing_selenium_processes():
             psutil.Process(process.info["pid"]).terminate()
 
 
-def start_selenium_server(ip_address):
+def start_selenium_server():
     print(Fore.GREEN + "Starting Selenium Server...")
     jar_file = selenium_server_file
-    hub_command = f"java -jar {jar_file} standalone"
-    node_command = f"java -jar {jar_file} node --hub http://{ip_address}:4444"
+    command = f"java -jar {jar_file} standalone"
 
     terminate_existing_selenium_processes()
 
-    print(Fore.GREEN + "Starting Selenium Hub...")
-    hub_process = subprocess.Popen(
-        hub_command.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+    print(Fore.GREEN + "Starting Selenium...")
+    process = subprocess.Popen(
+        command.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT
     )
 
-    time.sleep(5)
-
-    if hub_process.poll() is not None:
-        print(Fore.RED + "Failed to start Selenium Hub. Output:")
-        print(hub_process.stdout.read().decode())
-        return None, None
-
-    print(Fore.GREEN + "Starting Selenium Node...")
-    node_process = subprocess.Popen(
-        node_command.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT
-    )
 
     start_time = time.time()
     timeout = 30  # seconds
 
     while time.time() - start_time < timeout:
-        hub_output = hub_process.stdout.readline().decode().strip()
+        hub_output = process.stdout.readline().decode().strip()
         if hub_output:
             print(f"Hub Output: {hub_output}")
 
-        node_output = node_process.stdout.readline().decode().strip()
-        if node_output:
-            print(f"Node Output: {node_output}")
-
-        if hub_process.poll() is None and node_process.poll() is None:
+        if process.poll() is None:
             break
 
         time.sleep(1)
 
-    if hub_process.poll() is not None or node_process.poll() is not None:
-        print(Fore.RED + "Failed to start Selenium Node. Output:")
-        if hub_process.poll() is not None:
-            print(hub_process.stdout.read().decode())
-        if node_process.poll() is not None:
-            print(node_process.stdout.read().decode())
+    if process.poll() is not None:
+        print(Fore.RED + "Failed to start Selenium. Output:")
+        if process.poll() is not None:
+            print(process.stdout.read().decode())
         return None, None
 
-    print(Fore.GREEN + "Selenium processes started, checking status...")
+    print(Fore.GREEN + "Selenium process started, checking status...")
 
     for process in psutil.process_iter(["pid", "cmdline"]):
         cmdline = process.info.get("cmdline", [])
@@ -92,4 +74,4 @@ def start_selenium_server(ip_address):
                 f"Selenium process running: PID {process.info['pid']} with cmdline {cmdline}"
             )
 
-    return hub_process, node_process
+    return process

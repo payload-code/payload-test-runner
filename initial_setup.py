@@ -2,7 +2,7 @@ import os
 import json
 from colorama import Fore
 
-config_file = "config.json"
+from config import CONFIG_FILE as config_file
 
 docker_compose_dir = None
 
