@@ -1,4 +1,4 @@
-from initial_setup import setup
+from initial_setup import setup, check_java_exists
 from selenium_management import (
     download_selenium_server,
     terminate_existing_selenium_processes,
@@ -13,6 +13,7 @@ import os
 def main():
     setup()
     download_selenium_server()
+    check_java_exists()
 
     hub_process, node_process = None, None
     try:
