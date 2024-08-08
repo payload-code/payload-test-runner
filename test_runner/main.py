@@ -1,3 +1,4 @@
+import os
 from initial_setup import setup
 from selenium_management import (
     download_selenium_server,
@@ -7,8 +8,6 @@ from selenium_management import (
 from docker_management import exit_containers, restart_containers
 from test_management import run_docker_tests, get_ip_address, print_payload_art, cleanup
 from colorama import Fore
-import os
-
 
 def main():
     setup()
@@ -29,7 +28,6 @@ def main():
             print(Fore.RED + "Failed to find IP address.")
     finally:
         cleanup(selenium_server)
-
 
 if __name__ == "__main__":
     main()

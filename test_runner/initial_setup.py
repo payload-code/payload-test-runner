@@ -1,7 +1,9 @@
 import os
+import sys
 import json
 from colorama import Fore
 
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import CONFIG_FILE as config_file
 
 docker_compose_dir = None

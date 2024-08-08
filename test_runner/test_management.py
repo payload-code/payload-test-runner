@@ -3,10 +3,13 @@ import subprocess
 import platform
 import inquirer
 import pickle
+import sys
 from art import text2art
 from colorama import Fore
 from docker_management import restart_containers, get_exited_containers
 from initial_setup import get_docker_compose_dir
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import DOCKER_COMPOSE_CMD
 
 cache_file = "test_cache.pkl"
